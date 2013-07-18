@@ -131,236 +131,101 @@ def validates(version):
     return _validates
 
 
-def _DEFAULT_TYPES(self):
-    if self._CREATED_WITH_DEFAULT_TYPES is None:
-        raise _DontDoThat()
+class BaseValidator(object):
+    VALIDATORS = {}
+    META_SCHEMA = None
+    DEFAULT_TYPES = {
+        "array" : list, "boolean" : bool, "integer" : int_types,
+        "null" : type(None), "number" : numbers.Number, "object" : dict,
+        "string" : str_types,
+    }
 
-    warn(
-        (
-            "The DEFAULT_TYPES attribute is deprecated. "
-            "See the type checker attached to this validator instead."
-        ),
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return self._DEFAULT_TYPES
+    def __init__(
+        self, schema, types=(), resolver=None, format_checker=None,
+    ):
+        self._types = dict(self.DEFAULT_TYPES)
+        self._types.update(types)
 
+        if resolver is None:
+            resolver = RefResolver.from_schema(schema)
 
-class _DefaultTypesDeprecatingMetaClass(type):
-    DEFAULT_TYPES = property(_DEFAULT_TYPES)
+        self.resolver = resolver
+        self.format_checker = format_checker
+        self.schema = schema
 
+    @classmethod
+    def check_schema(cls, schema):
+        for error in cls(cls.META_SCHEMA).iter_errors(schema):
+            raise SchemaError.create_from(error)
 
-def _id_of(schema):
-    if schema is True or schema is False:
-        return u""
-    return schema.get(u"$id", u"")
+    def iter_errors(self, instance, _schema=None):
+        if _schema is None:
+            _schema = self.schema
 
+        with self.resolver.in_scope(_schema.get("id", "")):
+            ref = _schema.get("$ref")
+            if ref is not None:
+                validators = [("$ref", ref)]
+            else:
+                validators = iteritems(_schema)
 
-def create(
-    meta_schema,
-    validators=(),
-    version=None,
-    default_types=None,
-    type_checker=None,
-    id_of=_id_of,
-):
-    """
-    Create a new validator class.
+            for k, v in validators:
+                validator = self.VALIDATORS.get(k)
+                if validator is None:
+                    continue
 
-    Arguments:
+                errors = validator(self, v, instance, _schema) or ()
+                for error in errors:
+                    # set details if not already set by the called fn
+                    error._set(
+                        validator=k,
+                        validator_value=v,
+                        instance=instance,
+                        schema=_schema,
+                    )
+                    if k != "$ref":
+                        error.schema_path.appendleft(k)
+                    yield error
 
-        meta_schema (collections.Mapping):
+    def descend(self, instance, schema, path=None, schema_path=None):
+        for error in self.iter_errors(instance, schema):
+            if path is not None:
+                error.path.appendleft(path)
+            if schema_path is not None:
+                error.schema_path.appendleft(schema_path)
+            yield error
 
-            the meta schema for the new validator class
+    def validate(self, *args, **kwargs):
+        for error in self.iter_errors(*args, **kwargs):
+            raise error
 
-        validators (collections.Mapping):
+    def is_type(self, instance, type):
+        if type not in self._types:
+            raise UnknownType(type)
+        pytypes = self._types[type]
 
-            a mapping from names to callables, where each callable will
-            validate the schema property with the given name.
-
-            Each callable should take 4 arguments:
-
-                1. a validator instance,
-                2. the value of the property being validated within the
-                   instance
-                3. the instance
-                4. the schema
-
-        version (str):
-
-            an identifier for the version that this validator class will
-            validate. If provided, the returned validator class will
-            have its ``__name__`` set to include the version, and also
-            will have `jsonschema.validators.validates` automatically
-            called for the given version.
-
-        type_checker (jsonschema.TypeChecker):
-
-            a type checker, used when applying the :validator:`type` validator.
-
-            If unprovided, a `jsonschema.TypeChecker` will be created
-            with a set of default types typical of JSON Schema drafts.
-
-        default_types (collections.Mapping):
-
-            .. deprecated:: 3.0.0
-
-                Please use the type_checker argument instead.
-
-            If set, it provides mappings of JSON types to Python types
-            that will be converted to functions and redefined in this
-            object's `jsonschema.TypeChecker`.
-
-        id_of (collections.Callable):
-
-            A function that given a schema, returns its ID.
-
-    Returns:
-
-        a new `jsonschema.IValidator` class
-    """
-
-    if default_types is not None:
-        if type_checker is not None:
-            raise TypeError(
-                "Do not specify default_types when providing a type checker.",
+        # bool inherits from int, so ensure bools aren't reported as ints
+        if isinstance(instance, bool):
+            pytypes = _utils.flatten(pytypes)
+            is_number = any(
+                issubclass(pytype, numbers.Number) for pytype in pytypes
             )
-        _created_with_default_types = True
-        warn(
-            (
-                "The default_types argument is deprecated. "
-                "Use the type_checker argument instead."
-            ),
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        type_checker = _types.TypeChecker(
-            type_checkers=_generate_legacy_type_checks(default_types),
-        )
-    else:
-        default_types = _DEPRECATED_DEFAULT_TYPES
-        if type_checker is None:
-            _created_with_default_types = False
-            type_checker = _TYPE_CHECKER_FOR_DEPRECATED_DEFAULT_TYPES
-        elif type_checker is _TYPE_CHECKER_FOR_DEPRECATED_DEFAULT_TYPES:
-            _created_with_default_types = False
-        else:
-            _created_with_default_types = None
+            if is_number and bool not in pytypes:
+                return False
+        return isinstance(instance, pytypes)
 
-    @add_metaclass(_DefaultTypesDeprecatingMetaClass)
-    class Validator(object):
+    def is_valid(self, instance, _schema=None):
+        error = next(self.iter_errors(instance, _schema), None)
+        return error is None
 
+
+def create(meta_schema, validators=(), version=None, default_types=None):  # noqa
+
+    class Validator(BaseValidator):
         VALIDATORS = dict(validators)
         META_SCHEMA = dict(meta_schema)
-        TYPE_CHECKER = type_checker
-        ID_OF = staticmethod(id_of)
-
-        DEFAULT_TYPES = property(_DEFAULT_TYPES)
-        _DEFAULT_TYPES = dict(default_types)
-        _CREATED_WITH_DEFAULT_TYPES = _created_with_default_types
-
-        def __init__(
-            self,
-            schema,
-            types=(),
-            resolver=None,
-            format_checker=None,
-        ):
-            if types:
-                warn(
-                    (
-                        "The types argument is deprecated. Provide "
-                        "a type_checker to jsonschema.validators.extend "
-                        "instead."
-                    ),
-                    DeprecationWarning,
-                    stacklevel=2,
-                )
-
-                self.TYPE_CHECKER = self.TYPE_CHECKER.redefine_many(
-                    _generate_legacy_type_checks(types),
-                )
-
-            if resolver is None:
-                resolver = RefResolver.from_schema(schema, id_of=id_of)
-
-            self.resolver = resolver
-            self.format_checker = format_checker
-            self.schema = schema
-
-        @classmethod
-        def check_schema(cls, schema):
-            for error in cls(cls.META_SCHEMA).iter_errors(schema):
-                raise exceptions.SchemaError.create_from(error)
-
-        def iter_errors(self, instance, _schema=None):
-            if _schema is None:
-                _schema = self.schema
-
-            if _schema is True:
-                return
-            elif _schema is False:
-                yield exceptions.ValidationError(
-                    "False schema does not allow %r" % (instance,),
-                    validator=None,
-                    validator_value=None,
-                    instance=instance,
-                    schema=_schema,
-                )
-                return
-
-            scope = id_of(_schema)
-            if scope:
-                self.resolver.push_scope(scope)
-            try:
-                ref = _schema.get(u"$ref")
-                if ref is not None:
-                    validators = [(u"$ref", ref)]
-                else:
-                    validators = iteritems(_schema)
-
-                for k, v in validators:
-                    validator = self.VALIDATORS.get(k)
-                    if validator is None:
-                        continue
-
-                    errors = validator(self, v, instance, _schema) or ()
-                    for error in errors:
-                        # set details if not already set by the called fn
-                        error._set(
-                            validator=k,
-                            validator_value=v,
-                            instance=instance,
-                            schema=_schema,
-                        )
-                        if k != u"$ref":
-                            error.schema_path.appendleft(k)
-                        yield error
-            finally:
-                if scope:
-                    self.resolver.pop_scope()
-
-        def descend(self, instance, schema, path=None, schema_path=None):
-            for error in self.iter_errors(instance, schema):
-                if path is not None:
-                    error.path.appendleft(path)
-                if schema_path is not None:
-                    error.schema_path.appendleft(schema_path)
-                yield error
-
-        def validate(self, *args, **kwargs):
-            for error in self.iter_errors(*args, **kwargs):
-                raise error
-
-        def is_type(self, instance, type):
-            try:
-                return self.TYPE_CHECKER.is_type(instance, type)
-            except exceptions.UndefinedTypeCheck:
-                raise exceptions.UnknownType(type, instance, self.schema)
-
-        def is_valid(self, instance, _schema=None):
-            error = next(self.iter_errors(instance, _schema), None)
-            return error is None
+        if default_types is not None:
+            DEFAULT_TYPES = dict(default_types)
 
     if version is not None:
         Validator = validates(version)(Validator)
