@@ -24,7 +24,7 @@ except ImportError:
 from jsonschema import (
     FormatError, SchemaError, ValidationError, Draft3Validator,
     Draft4Validator, FormatChecker, draft3_format_checker,
-    draft4_format_checker, validate,
+    draft4_format_checker, validate, serialize,
 )
 from jsonschema.compat import PY3
 from jsonschema.tests.compat import mock, unittest
@@ -57,6 +57,8 @@ def make_case(schema, data, valid, name):
         def test_case(self):
             kwargs = getattr(self, "validator_kwargs", {})
             validate(data, schema, cls=self.validator_class, **kwargs)
+            result = serialize(data, schema, cls=self.validator_class, **kwargs)
+            self.assertEquals(data, result)
     else:
         def test_case(self):
             kwargs = getattr(self, "validator_kwargs", {})
