@@ -177,12 +177,15 @@ class BaseValidator(object):
         return error is None
 
     def serialize(self, *args, **kwargs):
-        for error in self.iter_errors(*args, **kwargs):
-            raise error
-
-        result = self._validated[0]
-        self._validated[:] = []
-        return result
+        del self._validated[:]
+        try:
+            errors = list(self.iter_errors(*args, **kwargs))
+            if errors:
+                return None, errors
+            result = self._validated[0]
+            return result, errors
+        finally:
+            del self._validated[:]
 
 
 def create(meta_schema, validators=(), version=None, default_types=None):  # noqa
@@ -531,4 +534,7 @@ def serialize(instance, schema, cls=None, *args, **kwargs):
         cls = validator_for(schema)
     cls.check_schema(schema)
     serializer = cls(schema, *args, serialize=True, **kwargs)
-    return serializer.serialize(instance)
+    result, errors = serializer.serialize(instance)
+    if errors:
+        raise errors[0]
+    return result
