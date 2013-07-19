@@ -69,6 +69,8 @@ def make_case(schema, data, valid, name):
             kwargs = getattr(self, "validator_kwargs", {})
             with self.assertRaises(ValidationError):
                 validate(data, schema, cls=self.validator_class, **kwargs)
+            with self.assertRaises(ValidationError):
+                serialize(data, schema, cls=self.validator_class, **kwargs)
 
     if not PY3:
         name = name.encode("utf-8")

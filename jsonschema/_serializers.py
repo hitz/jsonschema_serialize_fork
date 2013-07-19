@@ -1,11 +1,12 @@
 import re
 from copy import deepcopy
+from jsonschema import _utils, _validators
 from jsonschema.compat import iteritems
-from jsonschema import _validators
-from jsonschema import _utils
+from jsonschema.exceptions import ValidationError
 
 
 REPLACEMENTS = {}
+
 
 def replaces(validator):
     def decorate(serializer):
