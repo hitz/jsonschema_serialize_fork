@@ -265,12 +265,15 @@ class BaseValidator(object):
         return error is None
 
     def serialize(self, *args, **kwargs):
-        for error in self.iter_errors(*args, **kwargs):
-            raise error
-
-        result = self._validated[0]
-        self._validated[:] = []
-        return result
+        del self._validated[:]
+        try:
+            errors = list(self.iter_errors(*args, **kwargs))
+            if errors:
+                return None, errors
+            result = self._validated[0]
+            return result, errors
+        finally:
+            del self._validated[:]
 
 
 def create(meta_schema, validators=(), version=None, default_types=None):  # noqa
@@ -852,7 +855,6 @@ def validate(instance, schema, cls=None, *args, **kwargs):
     if error is not None:
         raise error
 
-
 def validator_for(schema, default=_LATEST_VERSION):
     """
     Retrieve the validator class appropriate for validating the given schema.
@@ -871,7 +873,6 @@ def validator_for(schema, default=_LATEST_VERSION):
             the default to return if the appropriate validator class
             cannot be determined.
 
-<<<<<<< HEAD
             If unprovided, the default is to return the latest supported
             draft.
     """
@@ -888,12 +889,6 @@ def validator_for(schema, default=_LATEST_VERSION):
             stacklevel=2,
         )
     return meta_schemas.get(schema[u"$schema"], _LATEST_VERSION)
-=======
-def validate(instance, schema, cls=None, *args, **kwargs):
-    if cls is None:
-        cls = validator_for(schema)
-    cls.check_schema(schema)
-    cls(schema, *args, **kwargs).validate(instance)
 
 
 def serialize(instance, schema, cls=None, *args, **kwargs):
@@ -902,4 +897,7 @@ def serialize(instance, schema, cls=None, *args, **kwargs):
     cls.check_schema(schema)
     serializer = cls(schema, *args, serialize=True, **kwargs)
     return serializer.serialize(instance)
->>>>>>> Remaining failing tests are due to me testing the wrong thing.
+    result, errors = serializer.serialize(instance)
+    if errors:
+        raise errors[0]
+    return result
