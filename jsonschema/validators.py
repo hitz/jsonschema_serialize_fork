@@ -143,7 +143,8 @@ class BaseValidator(object):
     }
 
     def __init__(
-        self, schema, types=(), resolver=None, format_checker=None, serialize=False,
+        self, schema, types=(), resolver=None, format_checker=None,
+        serialize=False,
     ):
         self._types = dict(self.DEFAULT_TYPES)
         self._types.update(types)
@@ -181,7 +182,9 @@ class BaseValidator(object):
                 if self._serialize:
                     initial = self._copy_validated(instance, _schema)
                     seen = tuple(k for k, v in initial)
-                    validators = ((k, v) for k, v in validators if k not in seen)
+                    validators = (
+                        (k, v) for k, v in validators if k not in seen
+                    )
                     validators = itertools.chain(initial, validators)
 
             for k, v in validators:
@@ -213,7 +216,8 @@ class BaseValidator(object):
             # Ensure the properties validator is called
             validators = [
                 ('properties', schema.get('properties', {})),
-                ('additionalProperties', schema.get('additionalProperties', True)),                
+                ('additionalProperties',
+                    schema.get('additionalProperties', True)),
             ]
         elif self.is_type(instance, "array"):
             factory = self._types["array"]
@@ -222,7 +226,7 @@ class BaseValidator(object):
             validated_instance = factory()
             validators = [
                 ('items', schema.get('items', {})),
-                ('additionalItems', schema.get('additionalItems', True)),                
+                ('additionalItems', schema.get('additionalItems', True)),
             ]
         else:
             validated_instance = instance
