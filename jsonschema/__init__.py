@@ -26,6 +26,8 @@ from jsonschema.validators import (
     Draft7Validator,
     RefResolver,
     validate,
+    ErrorTree, 
+    serialize,
 )
 try:
     from importlib import metadata

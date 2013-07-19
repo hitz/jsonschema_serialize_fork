@@ -5,6 +5,7 @@ from __future__ import division
 
 from warnings import warn
 import contextlib
+import itertools
 import json
 import numbers
 
@@ -16,6 +17,7 @@ from jsonschema import (
     _utils,
     _validators,
     exceptions,
+    _serializers,
 )
 from jsonschema.compat import (
     Sequence,
@@ -141,7 +143,7 @@ class BaseValidator(object):
     }
 
     def __init__(
-        self, schema, types=(), resolver=None, format_checker=None,
+        self, schema, types=(), resolver=None, format_checker=None, serialize=False,
     ):
         self._types = dict(self.DEFAULT_TYPES)
         self._types.update(types)
@@ -152,6 +154,14 @@ class BaseValidator(object):
         self.resolver = resolver
         self.format_checker = format_checker
         self.schema = schema
+        self._serialize = serialize
+
+        if self._serialize:
+            self._validated = []
+            self.VALIDATORS = dict(
+                (k, _serializers.REPLACEMENTS.get(v, v))
+                for k, v in self.VALIDATORS.iteritems()
+            )
 
     @classmethod
     def check_schema(cls, schema):
@@ -168,6 +178,11 @@ class BaseValidator(object):
                 validators = [("$ref", ref)]
             else:
                 validators = iteritems(_schema)
+                if self._serialize:
+                    initial = self._copy_validated(instance, _schema)
+                    seen = tuple(k for k, v in initial)
+                    validators = ((k, v) for k, v in validators if k not in seen)
+                    validators = itertools.chain(initial, validators)
 
             for k, v in validators:
                 validator = self.VALIDATORS.get(k)
@@ -186,6 +201,33 @@ class BaseValidator(object):
                     if k != "$ref":
                         error.schema_path.appendleft(k)
                     yield error
+
+    def _copy_validated(self, instance, schema):
+        validators = ()
+        if self.is_type(instance, "object"):
+            # Validator can be set to use an OrderedDict
+            factory = self._types["object"]
+            if not isinstance(factory, type):
+                factory = factory[0]
+            validated_instance = factory()
+            # Ensure the properties validator is called
+            validators = [
+                ('properties', schema.get('properties', {})),
+                ('additionalProperties', schema.get('additionalProperties', True)),                
+            ]
+        elif self.is_type(instance, "array"):
+            factory = self._types["array"]
+            if not isinstance(factory, type):
+                factory = factory[0]
+            validated_instance = factory()
+            validators = [
+                ('items', schema.get('items', {})),
+                ('additionalItems', schema.get('additionalItems', True)),                
+            ]
+        else:
+            validated_instance = instance
+        self._validated.append(validated_instance)
+        return validators
 
     def descend(self, instance, schema, path=None, schema_path=None):
         for error in self.iter_errors(instance, schema):
@@ -217,6 +259,14 @@ class BaseValidator(object):
     def is_valid(self, instance, _schema=None):
         error = next(self.iter_errors(instance, _schema), None)
         return error is None
+
+    def serialize(self, *args, **kwargs):
+        for error in self.iter_errors(*args, **kwargs):
+            raise error
+
+        result = self._validated[0]
+        self._validated[:] = []
+        return result
 
 
 def create(meta_schema, validators=(), version=None, default_types=None):  # noqa
@@ -817,6 +867,7 @@ def validator_for(schema, default=_LATEST_VERSION):
             the default to return if the appropriate validator class
             cannot be determined.
 
+<<<<<<< HEAD
             If unprovided, the default is to return the latest supported
             draft.
     """
@@ -833,3 +884,18 @@ def validator_for(schema, default=_LATEST_VERSION):
             stacklevel=2,
         )
     return meta_schemas.get(schema[u"$schema"], _LATEST_VERSION)
+=======
+def validate(instance, schema, cls=None, *args, **kwargs):
+    if cls is None:
+        cls = validator_for(schema)
+    cls.check_schema(schema)
+    cls(schema, *args, **kwargs).validate(instance)
+
+
+def serialize(instance, schema, cls=None, *args, **kwargs):
+    if cls is None:
+        cls = validator_for(schema)
+    cls.check_schema(schema)
+    serializer = cls(schema, *args, serialize=True, **kwargs)
+    return serializer.serialize(instance)
+>>>>>>> Remaining failing tests are due to me testing the wrong thing.

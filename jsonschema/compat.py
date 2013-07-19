@@ -13,6 +13,7 @@ try:
 except ImportError:
     from collections import MutableMapping, Sequence  # noqa
 
+
 PY3 = sys.version_info[0] >= 3
 
 if PY3:

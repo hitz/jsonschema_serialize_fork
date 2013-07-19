@@ -21,8 +21,93 @@ from jsonschema import (
 )
 from jsonschema.tests._helpers import bug
 from jsonschema.tests._suite import Suite
-from jsonschema.validators import _DEPRECATED_DEFAULT_TYPES, create
+from jsonschema.validators import (
+    _DEPRECATED_DEFAULT_TYPES,
+    create
+    FormatError,
+    SchemaError,
+    ValidationError,
+    FormatChecker,
+    validate, 
+    serialize,
+)
+from jsonschema.compat import PY3
+from jsonschema.tests.compat import mock, unittest
+import jsonschema
 
+
+REPO_ROOT = os.path.join(os.path.dirname(jsonschema.__file__), os.path.pardir)
+SUITE = os.getenv("JSON_SCHEMA_TEST_SUITE", os.path.join(REPO_ROOT, "json"))
+
+if not os.path.isdir(SUITE):
+    raise ValueError(
+        "Can't find the JSON-Schema-Test-Suite directory. Set the "
+        "'JSON_SCHEMA_TEST_SUITE' environment variable or run the tests from "
+        "alongside a checkout of the suite."
+    )
+
+TESTS_DIR = os.path.join(SUITE, "tests")
+JSONSCHEMA_SUITE = os.path.join(SUITE, "bin", "jsonschema_suite")
+
+REMOTES = subprocess.Popen(
+    ["python", JSONSCHEMA_SUITE, "remotes"], stdout=subprocess.PIPE,
+).stdout
+if PY3:
+    REMOTES = io.TextIOWrapper(REMOTES)
+REMOTES = json.load(REMOTES)
+
+
+def make_case(schema, data, valid, name):
+    if valid:
+        def test_case(self):
+            kwargs = getattr(self, "validator_kwargs", {})
+            validate(data, schema, cls=self.validator_class, **kwargs)
+            result = serialize(data, schema, cls=self.validator_class, **kwargs)
+            self.assertEquals(data, result)
+    else:
+        def test_case(self):
+            kwargs = getattr(self, "validator_kwargs", {})
+            with self.assertRaises(ValidationError):
+                validate(data, schema, cls=self.validator_class, **kwargs)
+
+    if not PY3:
+        name = name.encode("utf-8")
+    test_case.__name__ = name
+
+    return test_case
+
+
+def maybe_skip(skip, test, case):
+    if skip is not None:
+        reason = skip(case)
+        if reason is not None:
+            test = unittest.skip(reason)(test)
+    return test
+
+
+def load_json_cases(tests_glob, ignore_glob="", basedir=TESTS_DIR, skip=None):
+    if ignore_glob:
+        ignore_glob = os.path.join(basedir, ignore_glob)
+
+    def add_test_methods(test_class):
+        ignored = set(glob.iglob(ignore_glob))
+
+        for filename in glob.iglob(os.path.join(basedir, tests_glob)):
+            if filename in ignored:
+                continue
+
+            validating, _ = os.path.splitext(os.path.basename(filename))
+            id = itertools.count(1)
+
+            with open(filename) as test_file:
+                for case in json.load(test_file):
+                    for test in case["tests"]:
+                        name = "test_%s_%s_%s" % (
+                            validating,
+                            next(id),
+                            re.sub(r"[\W ]+", "_", test["description"]),
+                        )
+                        assert not hasattr(test_class, name), name
 
 SUITE = Suite()
 DRAFT3 = SUITE.version(name="draft3")
