@@ -34,7 +34,7 @@ def patternProperties(validator, patternProperties, instance, schema):
                     yield error
                 if validator._serialize:
                     validated_instance[k] = validator._validated[lv]
-                    validator._validated[lv:] = []
+                    del validator._validated[lv:]
 
 
 @replaces(_validators.additionalProperties)
@@ -58,7 +58,7 @@ def additionalProperties(validator, aP, instance, schema):
                 yield error
             if validator._serialize:
                 validated_instance[extra] = validator._validated[lv]
-                validator._validated[lv:] = []
+                del validator._validated[lv:]
 
     elif not aP:
         error = "Additional properties are not allowed (%s %s unexpected)"
@@ -84,7 +84,7 @@ def items(validator, items, instance, schema):
                 yield error
             if validator._serialize:
                 validated_instance.append(validator._validated[lv])
-                validator._validated[lv:] = []
+                del validator._validated[lv:]
     else:
         for (index, item), subschema in zip(enumerate(instance), items):
             if validator._serialize:
@@ -95,7 +95,7 @@ def items(validator, items, instance, schema):
                 yield error
             if validator._serialize:
                 validated_instance.append(validator._validated[lv])
-                validator._validated[lv:] = []
+                del validator._validated[lv:]
 
 
 @replaces(_validators.additionalItems)
@@ -117,7 +117,7 @@ def additionalItems(validator, aI, instance, schema):
                 yield error
             if validator._serialize:
                 validated_instance.append(validator._validated[lv])
-                validator._validated[lv:] = []
+                del validator._validated[lv:]
     elif len(instance) > len(schema.get("items", [])):
         if not aI:
             error = "Additional items are not allowed (%s %s unexpected)"
@@ -151,7 +151,7 @@ def properties_draft3(validator, properties, instance, schema):
                 yield error
             if validator._serialize:
                 validated_instance[property] = validator._validated[lv]
-                validator._validated[lv:] = []
+                del validator._validated[lv:]
         else:
             if validator._serialize and "default" in subschema:
                 validated_instance[property] = deepcopy(subschema["default"])
@@ -190,6 +190,6 @@ def properties_draft4(validator, properties, instance, schema):
                 yield error
             if validator._serialize:
                 validated_instance[property] = validator._validated[lv]
-                validator._validated[lv:] = []
+                del validator._validated[lv:]
         elif validator._serialize and "default" in subschema:
             validated_instance[property] = deepcopy(subschema["default"])
