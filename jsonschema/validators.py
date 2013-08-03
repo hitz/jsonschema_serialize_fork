@@ -268,8 +268,6 @@ class BaseValidator(object):
         del self._validated[:]
         try:
             errors = list(self.iter_errors(*args, **kwargs))
-            if errors:
-                return None, errors
             result = self._validated[0]
             return result, errors
         finally:
