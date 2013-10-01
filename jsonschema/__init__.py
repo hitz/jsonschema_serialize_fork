@@ -19,6 +19,7 @@ from jsonschema._format import (
     draft7_format_checker,
 )
 from jsonschema._types import TypeChecker
+from jsonschema._serializers import NO_DEFAULT
 from jsonschema.validators import (
     Draft3Validator,
     Draft4Validator,
