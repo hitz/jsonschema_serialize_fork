@@ -53,10 +53,11 @@ class BaseValidator(object):
         "null" : type(None), "number" : numbers.Number, "object" : dict,
         "string" : str_types,
     }
+    SERVER_DEFAULTS = {}
 
     def __init__(
         self, schema, types=(), resolver=None, format_checker=None,
-        serialize=False,
+        serialize=False, server_defaults=(),
     ):
         self._types = dict(self.DEFAULT_TYPES)
         self._types.update(types)
@@ -75,6 +76,8 @@ class BaseValidator(object):
                 (k, _serializers.REPLACEMENTS.get(v, v))
                 for k, v in self.VALIDATORS.iteritems()
             )
+            self._server_defaults = dict(self.SERVER_DEFAULTS)
+            self._server_defaults.update(server_defaults)
 
     @classmethod
     def check_schema(cls, schema):
@@ -184,6 +187,11 @@ class BaseValidator(object):
             return result, errors
         finally:
             del self._validated[:]
+
+    def server_default(self, property, subschema):
+        factory_name = subschema['serverDefault']
+        factory = self._server_defaults[factory_name]
+        return factory(property, subschema)
 
 
 def create(meta_schema, validators=(), version=None, default_types=None):  # noqa

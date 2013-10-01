@@ -153,8 +153,12 @@ def properties_draft3(validator, properties, instance, schema):
                 validated_instance[property] = validator._validated[lv]
                 del validator._validated[lv:]
         else:
-            if validator._serialize and "default" in subschema:
-                validated_instance[property] = deepcopy(subschema["default"])
+            if validator._serialize:
+                if "default" in subschema:
+                    validated_instance[property] = deepcopy(subschema["default"])
+                if "serverDefault" in subschema:
+                    default = validator.server_default(property, subschema)
+                    validated_instance[property] = default
             if subschema.get("required", False):
                 error = ValidationError("%r is a required property" % property)
                 error._set(
@@ -191,5 +195,10 @@ def properties_draft4(validator, properties, instance, schema):
             if validator._serialize:
                 validated_instance[property] = validator._validated[lv]
                 del validator._validated[lv:]
-        elif validator._serialize and "default" in subschema:
-            validated_instance[property] = deepcopy(subschema["default"])
+        elif validator._serialize:
+            if "default" in subschema:
+                validated_instance[property] = deepcopy(subschema["default"])
+            if "serverDefault" in subschema:
+                default = validator.server_default(property, subschema)
+                validated_instance[property] = default
+                
