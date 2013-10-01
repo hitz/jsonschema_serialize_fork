@@ -2,6 +2,12 @@ from jsonschema.tests.compat import OrderedDict, unittest
 from jsonschema.validators import Draft4Validator
 
 
+def make_default(property, subschema):
+    assert property == 'foo'
+    assert subschema == {"serverDefault": "test"}
+    return 'bar'
+
+
 class SerializeMixin(object):
     def test_it_serializes_default_properties(self):
         schema = {"properties": {"foo": {"default": "bar"}}}
@@ -12,6 +18,22 @@ class SerializeMixin(object):
     def test_it_serializes_default_properties_in_items(self):
         schema = {"items": {"properties": {"foo": {"default": "bar"}}}}
         result, errors = self.validator_class(schema, serialize=True).serialize([{}])
+        self.assertEquals(result, [{"foo": "bar"}])
+        self.assertEquals(errors, [])
+
+    def test_it_serializes_server_default_properties(self):
+        schema = {"properties": {"foo": {"serverDefault": "test"}}}
+        result, errors = self.validator_class(
+            schema, serialize=True, server_defaults={'test': make_default},
+            ).serialize({})
+        self.assertEquals(result, {"foo": "bar"})
+        self.assertEquals(errors, [])
+
+    def test_it_serializes_server_default_properties_in_items(self):
+        schema = {"items": {"properties": {"foo": {"serverDefault": "test"}}}}
+        result, errors = self.validator_class(
+            schema, serialize=True, server_defaults={'test': make_default},
+            ).serialize([{}])
         self.assertEquals(result, [{"foo": "bar"}])
         self.assertEquals(errors, [])
 
