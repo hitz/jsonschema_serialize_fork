@@ -5,6 +5,7 @@ from jsonschema.compat import iteritems
 from jsonschema.exceptions import ValidationError
 
 
+NO_DEFAULT = object()
 REPLACEMENTS = {}
 
 
@@ -158,7 +159,8 @@ def properties_draft3(validator, properties, instance, schema):
                     validated_instance[property] = deepcopy(subschema["default"])
                 if "serverDefault" in subschema:
                     default = validator.server_default(property, subschema)
-                    validated_instance[property] = default
+                    if default is not NO_DEFAULT:
+                        validated_instance[property] = default
             if subschema.get("required", False):
                 error = ValidationError("%r is a required property" % property)
                 error._set(
@@ -200,5 +202,5 @@ def properties_draft4(validator, properties, instance, schema):
                 validated_instance[property] = deepcopy(subschema["default"])
             if "serverDefault" in subschema:
                 default = validator.server_default(property, subschema)
-                validated_instance[property] = default
-                
+                if default is not NO_DEFAULT:
+                    validated_instance[property] = default
