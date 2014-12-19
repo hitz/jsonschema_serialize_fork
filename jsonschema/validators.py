@@ -162,7 +162,7 @@ class BaseValidator(object):
             self._validated = []
             self.VALIDATORS = dict(
                 (k, _serializers.REPLACEMENTS.get(v, v))
-                for k, v in self.VALIDATORS.iteritems()
+                for k, v in iteritems(self.VALIDATORS)
             )
             self._server_defaults = dict(self.SERVER_DEFAULTS)
             self._server_defaults.update(server_defaults)
