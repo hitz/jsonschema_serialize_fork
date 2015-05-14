@@ -280,10 +280,10 @@ class BaseValidator(object):
         finally:
             del self._validated[:]
 
-    def server_default(self, property, subschema):
+    def server_default(self, instance, subschema):
         factory_name = subschema['serverDefault']
         factory = self._server_defaults[factory_name]
-        return factory(property, subschema)
+        return factory(instance, subschema)
 
 
 def create(meta_schema, validators=(), version=None, default_types=None):  # noqa

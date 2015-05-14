@@ -158,7 +158,7 @@ def properties_draft3(validator, properties, instance, schema):
                 if "default" in subschema:
                     validated_instance[property] = deepcopy(subschema["default"])
                 if "serverDefault" in subschema:
-                    default = validator.server_default(property, subschema)
+                    default = validator.server_default(instance, subschema)
                     if default is not NO_DEFAULT:
                         validated_instance[property] = default
             if subschema.get("required", False):
@@ -201,6 +201,6 @@ def properties_draft4(validator, properties, instance, schema):
             if "default" in subschema:
                 validated_instance[property] = deepcopy(subschema["default"])
             if "serverDefault" in subschema:
-                default = validator.server_default(property, subschema)
+                default = validator.server_default(instance, subschema)
                 if default is not NO_DEFAULT:
                     validated_instance[property] = default
