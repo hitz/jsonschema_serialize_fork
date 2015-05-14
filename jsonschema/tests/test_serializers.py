@@ -1,9 +1,11 @@
 from jsonschema.tests.compat import OrderedDict, unittest
 from jsonschema.validators import Draft4Validator
+from jsonschema import NO_DEFAULT
 
 
-def make_default(property, subschema):
-    assert property == 'foo'
+def make_default(instance, subschema):
+    if instance.get('skip'):
+        return NO_DEFAULT
     assert subschema == {"serverDefault": "test"}
     return 'bar'
 
@@ -27,6 +29,14 @@ class SerializeMixin(object):
             schema, serialize=True, server_defaults={'test': make_default},
             ).serialize({})
         self.assertEquals(result, {"foo": "bar"})
+        self.assertEquals(errors, [])
+
+    def test_it_ignores_server_default_returning_no_default(self):
+        schema = {"properties": {"foo": {"serverDefault": "test"}, "skip": {}}}
+        result, errors = self.validator_class(
+            schema, serialize=True, server_defaults={'test': make_default},
+            ).serialize({'skip': True})
+        self.assertEquals(result, {"skip": True})
         self.assertEquals(errors, [])
 
     def test_it_serializes_server_default_properties_in_items(self):
