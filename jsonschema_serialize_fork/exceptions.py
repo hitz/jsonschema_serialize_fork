@@ -2,8 +2,8 @@ import collections
 import pprint
 import textwrap
 
-from jsonschema import _utils
-from jsonschema.compat import PY3, iteritems
+from jsonschema_serialize_fork import _utils
+from jsonschema_serialize_fork.compat import PY3, iteritems
 
 
 _unset = _utils.Unset()

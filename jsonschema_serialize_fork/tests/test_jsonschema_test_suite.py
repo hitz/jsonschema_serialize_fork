@@ -21,14 +21,14 @@ try:
 except ImportError:
     pypy_version_info = None
 
-from jsonschema import (
+from jsonschema_serialize_fork import (
     FormatError, SchemaError, ValidationError, Draft3Validator,
     Draft4Validator, FormatChecker, draft3_format_checker,
     draft4_format_checker, validate, serialize,
 )
-from jsonschema.compat import PY3
-from jsonschema.tests.compat import mock, unittest
-import jsonschema
+from jsonschema_serialize_fork.compat import PY3
+from jsonschema_serialize_fork.tests.compat import mock, unittest
+import jsonschema_serialize_fork as jsonschema
 
 
 REPO_ROOT = os.path.join(os.path.dirname(jsonschema.__file__), os.path.pardir)
@@ -240,7 +240,7 @@ class TestDraft4(unittest.TestCase, TypesMixin, DecimalMixin, FormatMixin):
 
 class RemoteRefResolutionMixin(object):
     def setUp(self):
-        patch = mock.patch("jsonschema.validators.requests")
+        patch = mock.patch("jsonschema_serialize_fork.validators.requests")
         requests = patch.start()
         requests.get.side_effect = self.resolve
         self.addCleanup(patch.stop)

@@ -4,10 +4,10 @@ import json
 import pprint
 import textwrap
 
-from jsonschema import FormatChecker, ValidationError
-from jsonschema.compat import PY3
-from jsonschema.tests.compat import mock, unittest
-from jsonschema.validators import (
+from jsonschema_serialize_fork import FormatChecker, ValidationError
+from jsonschema_serialize_fork.compat import PY3
+from jsonschema_serialize_fork.tests.compat import mock, unittest
+from jsonschema_serialize_fork.validators import (
     RefResolutionError, UnknownType, ErrorTree, Draft3Validator,
     Draft4Validator, RefResolver, create, extend, validator_for, validate,
 )
@@ -52,14 +52,14 @@ class TestCreateAndExtend(unittest.TestCase):
         )
 
     def test_if_a_version_is_provided_it_is_registered(self):
-        with mock.patch("jsonschema.validators.validates") as validates:
+        with mock.patch("jsonschema_serialize_fork.validators.validates") as validates:
             validates.side_effect = lambda version : lambda cls : cls
             Validator = create(meta_schema={"id" : "id"}, version="my version")
         validates.assert_called_once_with("my version")
         self.assertEqual(Validator.__name__, "MyVersionValidator")
 
     def test_if_a_version_is_not_provided_it_is_not_registered(self):
-        with mock.patch("jsonschema.validators.validates") as validates:
+        with mock.patch("jsonschema_serialize_fork.validators.validates") as validates:
             create(meta_schema={"id" : "id"})
         self.assertFalse(validates.called)
 
@@ -721,7 +721,7 @@ class TestRefResolver(unittest.TestCase):
         ref = "http://bar#baz"
         schema = {"baz" : 12}
 
-        with mock.patch("jsonschema.validators.requests") as requests:
+        with mock.patch("jsonschema_serialize_fork.validators.requests") as requests:
             requests.get.return_value.json.return_value = schema
             with self.resolver.resolving(ref) as resolved:
                 self.assertEqual(resolved, 12)
@@ -731,8 +731,8 @@ class TestRefResolver(unittest.TestCase):
         ref = "http://bar#baz"
         schema = {"baz" : 12}
 
-        with mock.patch("jsonschema.validators.requests", None):
-            with mock.patch("jsonschema.validators.urlopen") as urlopen:
+        with mock.patch("jsonschema_serialize_fork.validators.requests", None):
+            with mock.patch("jsonschema_serialize_fork.validators.urlopen") as urlopen:
                 urlopen.return_value.read.return_value = (
                     json.dumps(schema).encode("utf8"))
                 with self.resolver.resolving(ref) as resolved:

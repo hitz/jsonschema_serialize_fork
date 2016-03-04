@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-from jsonschema import __version__
+from jsonschema_serialize_fork import __version__
 
 
 with open("README.rst") as readme:
@@ -26,15 +26,15 @@ classifiers = [
 
 
 setup(
-    name="jsonschema",
+    name="jsonschema_serialize_fork",
     version=__version__,
-    packages=["jsonschema", "jsonschema.tests"],
-    package_data={'jsonschema': ['schemas/*.json']},
-    author="Julian Berman",
-    author_email="Julian@GrayVines.com",
+    packages=["jsonschema_serialize_fork", "jsonschema_serialize_fork.tests"],
+    package_data={'jsonschema_serialize_fork': ['schemas/*.json']},
+    author="Laurence Rowe, Julian Berman",
+    author_email="laurence@lrowe.co.uk",
     classifiers=classifiers,
-    description="An implementation of JSON Schema validation for Python",
+    description="Fork of Julian Berman's jsonschema to include support for serializing defaults",
     license="MIT",
     long_description=long_description,
-    url="http://github.com/Julian/jsonschema",
+    url="http://github.com/lrowe/jsonschema_serialize_fork",
 )

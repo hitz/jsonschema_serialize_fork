@@ -10,7 +10,7 @@ import textwrap
 import timeit
 
 
-IMPORT = "from jsonschema import Draft3Validator, Draft4Validator, validate\n"
+IMPORT = "from jsonschema_serialize_fork import Draft3Validator, Draft4Validator, validate\n"
 
 
 parser = argparse.ArgumentParser()

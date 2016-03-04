@@ -1,5 +1,5 @@
-from jsonschema.tests.compat import OrderedDict, unittest
-from jsonschema.validators import Draft4Validator
+from jsonschema_serialize_fork.tests.compat import OrderedDict, unittest
+from jsonschema_serialize_fork.validators import Draft4Validator
 
 
 def make_default(property, subschema):

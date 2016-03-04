@@ -1,8 +1,8 @@
 import re
 
-from jsonschema import _utils
-from jsonschema.exceptions import FormatError, ValidationError
-from jsonschema.compat import iteritems
+from jsonschema_serialize_fork import _utils
+from jsonschema_serialize_fork.exceptions import FormatError, ValidationError
+from jsonschema_serialize_fork.compat import iteritems
 
 
 FLOAT_TOLERANCE = 10 ** -15

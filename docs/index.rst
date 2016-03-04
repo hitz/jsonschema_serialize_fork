@@ -11,7 +11,7 @@ for Python (supporting 2.6+ including Python 3).
 
 .. code-block:: python
 
-    >>> from jsonschema import validate
+    >>> from jsonschema_serialize_fork import validate
 
     >>> # A sample schema, like what we'd get from json.load()
     >>> schema = {

@@ -22,7 +22,7 @@ started:
 
     .. code-block:: python
 
-        from jsonschema import Draft4Validator, validators
+        from jsonschema_serialize_fork import Draft4Validator, validators
 
 
         def extend_with_default(validator_class):

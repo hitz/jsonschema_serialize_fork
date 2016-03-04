@@ -11,12 +11,12 @@ try:
 except ImportError:
     requests = None
 
-from jsonschema import _utils, _validators, _serializers
-from jsonschema.compat import (
+from jsonschema_serialize_fork import _utils, _validators, _serializers
+from jsonschema_serialize_fork.compat import (
     PY3, Sequence, urljoin, urlsplit, urldefrag, unquote, urlopen,
     str_types, int_types, iteritems,
 )
-from jsonschema.exceptions import RefResolutionError, SchemaError, UnknownType
+from jsonschema_serialize_fork.exceptions import RefResolutionError, SchemaError, UnknownType
 
 
 _unset = _utils.Unset()
