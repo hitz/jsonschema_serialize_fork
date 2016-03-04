@@ -8,7 +8,7 @@ Most commonly, `validate` is the quickest way to simply validate a given
 instance under a schema, and will create a validator for you.
 """
 
-from jsonschema.exceptions import (
+from jsonschema_serialize_fork.exceptions import (
     ErrorTree, FormatError, RefResolutionError, SchemaError, ValidationError
 )
 from jsonschema._format import (
@@ -18,18 +18,19 @@ from jsonschema._format import (
     draft6_format_checker,
     draft7_format_checker,
 )
-from jsonschema._types import TypeChecker
-from jsonschema._serializers import NO_DEFAULT
-from jsonschema.validators import (
+from jsonschema_serialize_fork._types import TypeChecker
+from jsonschema_serialize_fork.validators import (
     Draft3Validator,
     Draft4Validator,
     Draft6Validator,
     Draft7Validator,
     RefResolver,
     validate,
-    ErrorTree, 
+    ErrorTree,
     serialize,
 )
+from jsonschema_serialize_fork._serializers import NO_DEFAULT
+
 try:
     from importlib import metadata
 except ImportError: # for Python<3.8

@@ -11,7 +11,7 @@ import numbers
 
 from six import add_metaclass
 
-from jsonschema import (
+from jsonschema_serialize_fork import (
     _legacy_validators,
     _types,
     _utils,
@@ -19,7 +19,7 @@ from jsonschema import (
     exceptions,
     _serializers,
 )
-from jsonschema.compat import (
+from jsonschema_serialize_fork.compat import (
     Sequence,
     int_types,
     iteritems,
@@ -31,11 +31,15 @@ from jsonschema.compat import (
     urlopen,
     urlsplit,
 )
+#from jsonschema_serialize_fork.compat import (
+#    PY3
+#)
+from jsonschema_serialize_fork.exceptions import RefResolutionError, SchemaError, UnknownType
 
 # Sigh. https://gitlab.com/pycqa/flake8/issues/280
 #       https://github.com/pyga/ebb-lint/issues/7
 # Imported for backwards compatibility.
-from jsonschema.exceptions import ErrorTree
+from jsonschema_serialize_fork.exceptions import ErrorTree
 ErrorTree
 
 

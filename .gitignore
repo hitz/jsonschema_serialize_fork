@@ -3,3 +3,6 @@ _static
 _templates
 
 TODO
+.tox
+.vscode
+.eggs

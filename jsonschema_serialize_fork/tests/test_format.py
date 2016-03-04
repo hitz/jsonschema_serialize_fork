@@ -3,9 +3,10 @@ Tests for the parts of jsonschema related to the :validator:`format` property.
 """
 
 from unittest import TestCase
+from jsonschema_serialize_fork.tests.compat import mock, unittest
 
-from jsonschema import FormatError, ValidationError, FormatChecker
-from jsonschema.validators import Draft4Validator
+from jsonschema_serialize_fork import FormatError, ValidationError, FormatChecker
+from jsonschema_serialize_fork.validators import Draft4Validator
 
 
 BOOM = ValueError("Boom!")

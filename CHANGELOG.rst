@@ -194,3 +194,10 @@ v0.3
 * Removed dependency on SecureTypes now that the hash bug has been resolved.
 * "Numerous bug fixes" -- most notably, a divisibleBy error for floats and a
   bunch of missing typechecks for irrelevant properties.
+
+v2.1.0 - serialize_fork
+------
+
+* Calculated defaults.
+* Support for serializing defaults.
+* Forked from Julian/jsonschema@04239dbfb9b9f349776bd59d4260071ba98978c4

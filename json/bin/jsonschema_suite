@@ -17,7 +17,7 @@ if getattr(unittest, "skipIf", None) is None:
     unittest.skipIf = lambda cond, msg : lambda fn : fn
 
 try:
-    import jsonschema
+    import jsonschema_serialize_fork as jsonschema
 except ImportError:
     jsonschema = None
 else:

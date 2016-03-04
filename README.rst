@@ -1,6 +1,6 @@
-==========
-jsonschema
-==========
+=========================
+jsonschema_serialize_fork
+=========================
 
 |PyPI| |Pythons| |Travis| |AppVeyor| |Codecov| |ReadTheDocs|
 
@@ -177,3 +177,6 @@ And for companies who appreciate ``jsonschema`` and its continued support
 and growth, ``jsonschema`` is also now supportable via `TideLift
 <https://tidelift.com/subscription/pkg/pypi-jsonschema?utm_source=pypi-j
 sonschema&utm_medium=referral&utm_campaign=readme>`_.
+This is a fork of the jsonschema 2.1.0dev to include support for serializing defaults.
+
+You probably want the original ``jsonschema`` which is on `GitHub <http://github.com/Julian/jsonschema>`_.

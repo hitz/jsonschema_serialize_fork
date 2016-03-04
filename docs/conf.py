@@ -59,7 +59,7 @@ copyright = u"2013, " + author
 #
 # version: The short X.Y version
 # release: The full version, including alpha/beta/rc tags.
-release = jsonschema.__version__
+from jsonschema_serialize_fork import __version__ as release
 version = release.partition("-")[0]
 
 # There are two options for replacing |today|: either, you set today to some
@@ -84,9 +84,8 @@ pygments_style = "sphinx"
 doctest_global_setup = dedent(
     """
     from __future__ import print_function
-    from jsonschema import *
-"""
-)
+    from jsonschema_serialize_fork import *
+""")
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/2.7", None),

@@ -9,7 +9,7 @@ See https://github.com/json-schema-org/JSON-Schema-Test-Suite for details.
 import sys
 import warnings
 
-from jsonschema import (
+from jsonschema_serialize_fork import (
     Draft3Validator,
     Draft4Validator,
     Draft6Validator,
@@ -19,9 +19,9 @@ from jsonschema import (
     draft6_format_checker,
     draft7_format_checker,
 )
-from jsonschema.tests._helpers import bug
-from jsonschema.tests._suite import Suite
-from jsonschema.validators import (
+from jsonschema_serialize_fork.tests._helpers import bug
+from jsonschema_serialize_fork.tests._suite import Suite
+from jsonschema_serialize_fork.validators import (
     _DEPRECATED_DEFAULT_TYPES,
     create
     FormatError,
@@ -31,9 +31,9 @@ from jsonschema.validators import (
     validate, 
     serialize,
 )
-from jsonschema.compat import PY3
-from jsonschema.tests.compat import mock, unittest
-import jsonschema
+from jsonschema_serialize_fork_serialize_fork.compat import PY3
+from jsonschema_serialize_fork_serialize_fork.tests.compat import mock, unittest
+import jsonschema_serialize_fork as jsonschema
 
 
 REPO_ROOT = os.path.join(os.path.dirname(jsonschema.__file__), os.path.pardir)
@@ -273,6 +273,12 @@ TestDraft6 = DRAFT6.to_unittest_testcase(
         )(test)
     ),
 )
+class RemoteRefResolutionMixin(object):
+    def setUp(self):
+        patch = mock.patch("jsonschema_serialize_fork.validators.requests")
+        requests = patch.start()
+        requests.get.side_effect = self.resolve
+        self.addCleanup(patch.stop)
 
 
 TestDraft7 = DRAFT7.to_unittest_testcase(

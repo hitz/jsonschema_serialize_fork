@@ -1,6 +1,6 @@
 import re
 
-from jsonschema._utils import (
+from jsonschema_serialize_fork._utils import (
     ensure_list,
     equal,
     extras_msg,
@@ -9,8 +9,8 @@ from jsonschema._utils import (
     unbool,
     uniq,
 )
-from jsonschema.exceptions import FormatError, ValidationError
-from jsonschema.compat import iteritems
+from jsonschema_serialize_fork.exceptions import FormatError, ValidationError
+from jsonschema_serialize_fork.compat import iteritems
 
 
 def patternProperties(validator, patternProperties, instance, schema):

@@ -11,6 +11,13 @@ import unittest
 
 from twisted.trial.unittest import SynchronousTestCase
 import attr
+from jsonschema_serialize_fork import FormatChecker, ValidationError
+from jsonschema_serialize_fork.compat import PY3
+from jsonschema_serialize_fork.tests.compat import mock, unittest
+from jsonschema_serialize_fork.validators import (
+    RefResolutionError, UnknownType, ErrorTree, Draft3Validator,
+    Draft4Validator, RefResolver, create, extend, validator_for, validate,
+)
 
 from jsonschema import FormatChecker, TypeChecker, exceptions, validators
 from jsonschema.compat import PY3, pathname2url
@@ -77,6 +84,7 @@ class TestCreateAndExtend(SynchronousTestCase):
         self.assertEqual(errors[0]._contents(), expected_error._contents())
 
     def test_if_a_version_is_provided_it_is_registered(self):
+<<<<<<< HEAD:jsonschema/tests/test_validators.py
         Validator = validators.create(
             meta_schema={u"$id": "something"},
             version="my version",
@@ -130,6 +138,18 @@ class TestCreateAndExtend(SynchronousTestCase):
                 ]
             ),
         )
+=======
+        with mock.patch("jsonschema_serialize_fork.validators.validates") as validates:
+            validates.side_effect = lambda version : lambda cls : cls
+            Validator = create(meta_schema={"id" : "id"}, version="my version")
+        validates.assert_called_once_with("my version")
+        self.assertEqual(Validator.__name__, "MyVersionValidator")
+
+    def test_if_a_version_is_not_provided_it_is_not_registered(self):
+        with mock.patch("jsonschema_serialize_fork.validators.validates") as validates:
+            create(meta_schema={"id" : "id"})
+        self.assertFalse(validates.called)
+>>>>>>> Rename to jsonschema_serialize_fork:jsonschema_serialize_fork/tests/test_validators.py
 
     def test_extend(self):
         original = dict(self.Validator.VALIDATORS)

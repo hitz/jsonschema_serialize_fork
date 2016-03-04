@@ -3,8 +3,8 @@ import re
 import socket
 import struct
 
-from jsonschema.compat import str_types
-from jsonschema.exceptions import FormatError
+from jsonschema_serialize_fork.compat import str_types
+from jsonschema_serialize_fork.exceptions import FormatError
 
 
 class FormatChecker(object):

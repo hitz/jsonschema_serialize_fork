@@ -27,7 +27,7 @@ be valid under the schema.)
 
     .. code-block:: python
 
-        from jsonschema import Draft7Validator, validators
+        from jsonschema_serialize_fork import Draft7Validator, validators
 
 
         def extend_with_default(validator_class):
