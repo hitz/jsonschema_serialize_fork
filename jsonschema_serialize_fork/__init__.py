@@ -22,7 +22,7 @@ from jsonschema_serialize_fork.validators import (
 )
 
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 
 # flake8: noqa

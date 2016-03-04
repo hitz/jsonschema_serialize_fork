@@ -1,3 +1,8 @@
+v2.1.1
+------
+
+* Supply instance to server default factory.
+
 v2.1.0
 ------
 
