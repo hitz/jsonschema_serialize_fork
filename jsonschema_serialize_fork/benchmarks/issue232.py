@@ -8,7 +8,7 @@ from twisted.python.filepath import FilePath
 from pyperf import Runner
 from pyrsistent import m
 
- from jsonschema_serialize_fork.tests._suite import Version
+from  jsonschema_serialize_fork.tests._suite import Version
 import jsonschema_serialize_fork as jsonschema
 
 

@@ -13,9 +13,9 @@ import unittest
 from twisted.python.filepath import FilePath
 import attr
 
-from jsonschema.compat import PY3
-from jsonschema.validators import validators
-import jsonschema_serialize_fork
+from jsonschema_serialize_fork.compat import PY3
+from jsonschema_serialize_fork.validators import validators
+import jsonschema_serialize_fork as jsonschema
 
 
 def _find_suite():

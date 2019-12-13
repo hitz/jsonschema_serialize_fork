@@ -7,8 +7,8 @@ import json
 import sys
 
 from jsonschema_serialize_fork import __version__
- from jsonschema_serialize_fork._reflect import namedAny
- from jsonschema_serialize_fork.validators import validator_for
+from  jsonschema_serialize_fork._reflect import namedAny
+from  jsonschema_serialize_fork.validators import validator_for
 
 
 def _namedAnyWithDefault(name):

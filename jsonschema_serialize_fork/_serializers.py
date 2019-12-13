@@ -1,6 +1,6 @@
 import re
 from copy import deepcopy
-from jsonschema_serialize_fork import _utils, _validators
+from jsonschema_serialize_fork import _utils, _validators, _legacy_validators
 from jsonschema_serialize_fork.compat import iteritems
 from jsonschema_serialize_fork.exceptions import ValidationError
 
@@ -131,7 +131,7 @@ def additionalItems(validator, aI, instance, schema):
                 validated_instance.append(deepcopy(item))
 
 
-@replaces(_validators.properties_draft3)
+@replaces(_legacy_validators.properties_draft3)
 def properties_draft3(validator, properties, instance, schema):
     if not validator.is_type(instance, "object"):
         return
@@ -174,7 +174,7 @@ def properties_draft3(validator, properties, instance, schema):
                 yield error
 
 
-@replaces(_validators.properties_draft4)
+@replaces(_validators.properties)
 def properties_draft4(validator, properties, instance, schema):
     if not validator.is_type(instance, "object"):
         return

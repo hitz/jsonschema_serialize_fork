@@ -4,8 +4,8 @@ import subprocess
 import sys
 
 from jsonschema_serialize_fork import Draft4Validator, ValidationError, cli, __version__
- from jsonschema_serialize_fork.compat import NativeIO
- from jsonschema_serialize_fork.exceptions import SchemaError
+from  jsonschema_serialize_fork.compat import NativeIO
+from  jsonschema_serialize_fork.exceptions import SchemaError
 
 
 def fake_validator(*errors):

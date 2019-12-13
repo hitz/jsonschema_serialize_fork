@@ -7,9 +7,9 @@ from collections import namedtuple
 from unittest import TestCase
 
 from jsonschema_serialize_fork import ValidationError, _validators
- from jsonschema_serialize_fork._types import TypeChecker
- from jsonschema_serialize_fork.exceptions import UndefinedTypeCheck
- from jsonschema_serialize_fork.validators import Draft4Validator, extend
+from  jsonschema_serialize_fork._types import TypeChecker
+from  jsonschema_serialize_fork.exceptions import UndefinedTypeCheck
+from  jsonschema_serialize_fork.validators import Draft4Validator, extend
 
 
 def equals_2(checker, instance):

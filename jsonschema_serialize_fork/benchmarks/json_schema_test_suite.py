@@ -7,7 +7,7 @@ JSON-Schema-Test-Suite. It will take some time to complete.
 """
 from pyperf import Runner
 
- from jsonschema_serialize_fork.tests._suite import Suite
+from  jsonschema_serialize_fork.tests._suite import Suite
 
 
 if __name__ == "__main__":

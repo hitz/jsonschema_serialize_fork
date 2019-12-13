@@ -20,8 +20,8 @@ from jsonschema_serialize_fork.validators import (
 )
 
 from jsonschema_serialize_fork import FormatChecker, TypeChecker, exceptions, validators
- from jsonschema_serialize_fork.compat import PY3, pathname2url
- from jsonschema_serialize_fork.tests._helpers import bug
+from  jsonschema_serialize_fork.compat import PY3, pathname2url
+from  jsonschema_serialize_fork.tests._helpers import bug
 
 
 def startswith(validator, startswith, instance, schema):
