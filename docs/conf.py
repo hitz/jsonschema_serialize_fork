@@ -7,7 +7,7 @@ import os
 import re
 import sys
 
-import jsonschema
+import jsonschema_serialize_fork as jsonschema
 
 
 # If extensions (or modules to document with autodoc) are in another directory,

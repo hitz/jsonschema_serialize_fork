@@ -11,7 +11,7 @@ instance under a schema, and will create a validator for you.
 from jsonschema_serialize_fork.exceptions import (
     ErrorTree, FormatError, RefResolutionError, SchemaError, ValidationError
 )
-from jsonschema._format import (
+from jsonschema_serialize_fork._format import (
     FormatChecker,
     draft3_format_checker,
     draft4_format_checker,
@@ -35,4 +35,4 @@ try:
     from importlib import metadata
 except ImportError: # for Python<3.8
     import importlib_metadata as metadata
-__version__ = metadata.version("jsonschema")
+__version__ = metadata.version("jsonschema_serialize_fork")

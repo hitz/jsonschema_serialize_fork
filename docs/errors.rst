@@ -343,8 +343,8 @@ to guess the most relevant error in a given bunch.
 
 .. doctest::
 
-        >>> from jsonschema import Draft7Validator
-        >>> from jsonschema.exceptions import best_match
+        >>> from jsonschema_serialize_fork import Draft7Validator
+        >>>  from jsonschema_serialize_fork.exceptions import best_match
 
         >>> schema = {
         ...     "type": "array",

@@ -15,7 +15,7 @@ import attr
 
 from jsonschema.compat import PY3
 from jsonschema.validators import validators
-import jsonschema
+import jsonschema_serialize_fork
 
 
 def _find_suite():

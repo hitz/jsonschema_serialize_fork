@@ -249,7 +249,7 @@ Draft 6 meta-schema, you could use:
 
 .. code-block:: python
 
-    from jsonschema import Draft6Validator
+    from jsonschema_serialize_fork import Draft6Validator
 
     schema = {
         "$schema": "https://json-schema.org/schema#",

@@ -1,8 +1,8 @@
 from unittest import TestCase
 import textwrap
 
-from jsonschema import Draft4Validator, exceptions
-from jsonschema.compat import PY3
+from jsonschema_serialize_fork import Draft4Validator, exceptions
+ from jsonschema_serialize_fork.compat import PY3
 
 
 class TestBestMatch(TestCase):

@@ -6,3 +6,7 @@ TODO
 .tox
 .vscode
 .eggs
+
+build/
+jsonschema_serialize_fork.egg-info/
+
